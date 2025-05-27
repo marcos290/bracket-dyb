@@ -173,7 +173,8 @@ const generarObjeto = () => objetos[Math.floor(Math.random() * objetos.length)]
 const discapacidades = [
   'Ninguna', 'Sin un ojo', 'Sin un brazo', 'Sin una pierna', 'Sin piernas', 'Sin dedo pulgar', 'Sin oreja',
   'Cojea', 'Brazo ortopédico', 'Pierna ortopédica', 'Ceguera parcial', 'Sin dedos de los pies', '8 dedos en una mano', 'Solo 3 dedos',
-  'Brazo hasta el codo', 'Sin boca', 'Sin pie', 'Sin mano', 'Sin rodilla', 'Sin codo', 'Sin hombro', 'Pierna hasta la rodilla'
+  'Brazo hasta el codo', 'Sin boca', 'Sin pie', 'Sin mano', 'Sin rodilla', 'Sin codo', 'Sin hombro', 'Pierna hasta la rodilla','Impotencia','Sin testículos','Dierna',
+  'Cegera total', 'Sin nariz', 'Sin cadera', 'Sin tobillo', 'Sin muñeca', 
 ]
 // Nueva función para generar discapacidad con un 20% de probabilidad
 function generarDiscapacidadProb() {
