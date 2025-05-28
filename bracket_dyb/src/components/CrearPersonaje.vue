@@ -6,12 +6,12 @@
         <div class="crear-form-col">
           <input v-model="nombre" placeholder="Nombre" class="crear-input" />
           <input v-model="pais" placeholder="País" class="crear-input" />
-          <input v-model="altura" placeholder="Altura (cm)" type="number" min="160" max="199" class="crear-input" />
-          <input v-model="peso" placeholder="Peso (kg)" type="number" min="50" max="150" class="crear-input" />
-          </div>
+          <input v-model="altura" placeholder="Altura (cm)" type="number" min="160" max="210" class="crear-input" @input="limitarAltura" />
+          <input v-model="peso" placeholder="Peso (kg)" type="number" min="50" max="180" class="crear-input" @input="limitarPeso" />
+        </div>
         <div class="crear-form-col">
           <input v-model="pressBanca" placeholder="Press banca (kg)" type="number" min="50" max="150" class="crear-input" />
-          <input v-model="agilidad" placeholder="Agilidad" type="number" min="0" max="100" class="crear-input" />
+          <input v-model="agilidad" placeholder="Agilidad" type="number" class="crear-input" :max="99" @input="limitarAgilidad" />
           <input v-model="profesion" placeholder="Profesión" class="crear-input" />
           <input v-model="discapacidad" placeholder="Discapacidad" class="crear-input" />
         </div>
@@ -41,6 +41,20 @@ const discapacidad = ref('')
 function limitarAgilidad() {
   if (Number(agilidad.value) > 99) {
     agilidad.value = '99'
+  }
+}
+
+// Limita el valor de altura a 210
+function limitarAltura() {
+  if (Number(altura.value) > 210) {
+    altura.value = '210'
+  }
+}
+
+// Limita el valor de peso a 180
+function limitarPeso() {
+  if (Number(peso.value) > 180) {
+    peso.value = '180'
   }
 }
 
