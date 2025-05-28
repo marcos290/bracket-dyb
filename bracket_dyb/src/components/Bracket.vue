@@ -527,49 +527,190 @@ function getLineHeight(numLuchadores) {
 </script>
 
 <style scoped>
+/* Variables globales */
+:root {
+  --primary: #6366f1;
+  --secondary: #ec4899;
+  --bg-white: #ffffff;
+  --text-dark: #1e293b;
+}
+
+/* Fondo y contenedor principal */
 .bracket-bg {
-  background: url('/bracket-bg.png'), linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%);
-  background-size: cover;
-  background-blend-mode: lighten;
+  background: var(--bg-white);
   min-height: 100vh;
-  padding: 1rem;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-container {
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.main-container {
-  width: 100%;
-}
+
+/* Header y contenido inicial mejorado */
 .header-bar {
+  background: rgba(24, 24, 27, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  padding: 4rem 3rem;
+  width: 90%;
+  max-width: 700px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 32rem;
-  margin-bottom: 2rem;
+  gap: 3rem;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    0 0 100px rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: headerAppear 0.8s ease-out;
 }
+
+.header-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent,
+    rgba(99, 102, 241, 0.5),
+    rgba(236, 72, 153, 0.5),
+    transparent
+  );
+  animation: shimmer 2s linear infinite;
+}
+
 .main-title {
-  font-size: 2rem;
+  font-size: 4.5rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #1e3a8a;
-  text-shadow: 1px 2px 6px #b3b3b3;
+  text-align: center;
+  margin: 0;
+  background: linear-gradient(135deg, 
+    #6366f1 0%, 
+    #ec4899 50%, 
+    #6366f1 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 3s ease infinite;
+  text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
+
 .fight-btn {
-  background: linear-gradient(to right, #facc15, #fde047);
-  color: #222;
-  font-weight: bold;
-  padding: 0.75rem 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px #eab30855;
-  border: 2px solid #fde047;
-  transition: background 0.2s;
-  animation: bounce 1s infinite alternate;
-  font-size: 1.1rem;
+  background: linear-gradient(45deg, #6366f1, #ec4899);
+  color: white;
+  border: none;
+  padding: 1.5rem 4rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 30px rgba(99, 102, 241, 0.3),
+    0 0 0 2px rgba(99, 102, 241, 0.2);
 }
-@keyframes bounce {
-  to { transform: translateY(-6px);}
+
+.fight-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: 0.6s;
+}
+
+.fight-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 20px 40px rgba(99, 102, 241, 0.4),
+    0 0 0 4px rgba(99, 102, 241, 0.3);
+  letter-spacing: 3px;
+}
+
+.fight-btn:hover::before {
+  left: 100%;
+}
+
+/* Animaciones */
+@keyframes headerAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .header-bar {
+    padding: 3rem 2rem;
+    width: 95%;
+  }
+
+  .main-title {
+    font-size: 3rem;
+  }
+
+  .fight-btn {
+    padding: 1.2rem 3rem;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+
+  .fight-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+  }
 }
 .winner-msg {
   color: #16a34a;
@@ -965,15 +1106,18 @@ function getLineHeight(numLuchadores) {
 }
 .bracket-visual-vertical-container {
   width: 100vw;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  height: 100vh;
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255,255,255,0.15);
   pointer-events: auto;
+  overflow: auto;
 }
 .bracket-vertical {
   display: flex;
