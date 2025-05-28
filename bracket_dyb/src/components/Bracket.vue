@@ -239,6 +239,10 @@ const nombresBase = [
   'Raúl', 'Patricia', 'Rubén', 'Isabel', 'Sergio', 'Cristina', 'Álvaro', 'María', 'Iván', 'Beatriz',
   'Hugo', 'Nuria', 'Pablo', 'Silvia', 'Mario', 'Rosa', 'Daniel', 'Eva', 'Alejandro', 'Julia',
   'Francisco', 'Teresa', 'Antonio', 'Natalia', 'José', 'Mónica', 'Guillermo', 'Lorena', 'Samuel', 'Clara',
+  'Óscar', 'Patricio', 'Esteban', 'Alicia', 'Gabriel', 'Noelia', 'Tomás', 'Andrea', 'Emilio', 'Victoria',
+  'Ángel', 'Sandra', 'Adrián', 'Irene', 'Enrique', 'Raquel', 'Felipe', 'Gloria', 'Joaquín', 'Verónica',
+  'Eduardo', 'Rocío', 'Fernando', 'Miriam', 'Jorge', 'Aitana', 'Luis', 'Lidia', 'Saúl', 'Elsa',
+  'Martín', 'Ainhoa', 'Bruno', 'Berta', 'Mateo', 'Ariadna', 'Lucas', 'Jimena', 'Marcos', 'Olga',
   'Iván', 'Esther', 'Dario', 'Carla', 'Julio', 'Lara', 'Sebastián', 'Aina', 'Ricardo', 'Nerea'
 ]
 const sexos = ['Masculino', 'Femenino']
@@ -270,7 +274,7 @@ const objetos = [
   'Cuerda', 'Taza', 'Regla', 'Martillo', 'Destornillador', 'Bolso', 'Sombrero', 'Piedra', 'Cuchara', 'Escoba', 'Calcetín', 'Palo selfie',
   'Almohada', 'Linterna', 'Pelota', 'Botella', 'Paraguas', 'Cascabel', 'Cinta adhesiva', 'Cubo', 'Espejo', 'Zapatilla',
   'Candelabro', 'Teléfono viejo', 'Llave inglesa', 'Cuaderno', 'Cacerola', 'Estuche', 'Cinta métrica', 'Gafas de sol', 'Juguete', 'Percha',
-  'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el
+  'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el pelo', 'Toalla', 'Globo', 'Alambre',
   'Dildo de Goma Rosa de 30 cm' ,'Muñeca inchable','Porro', 'Bastón de madera', 'Cinturón de castidad', 'Pipa de agua', 'Bola de bolos', 'Cuchara de palo', 'Escudo medieval',
 ];
 
