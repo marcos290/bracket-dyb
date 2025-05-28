@@ -11,7 +11,7 @@
           </div>
         <div class="crear-form-col">
           <input v-model="pressBanca" placeholder="Press banca (kg)" type="number" class="crear-input" />
-          <input v-model="agilidad" placeholder="Agilidad" type="number" class="crear-input" />
+          <input v-model="agilidad" placeholder="Agilidad" type="number" class="crear-input" :max="99" @input="limitarAgilidad" />
           <input v-model="profesion" placeholder="Profesión" class="crear-input" />
           <input v-model="discapacidad" placeholder="Discapacidad" class="crear-input" />
         </div>
@@ -36,6 +36,13 @@ const habilidad = ref('')
 const profesion = ref('')
 const peso = ref('')
 const discapacidad = ref('')
+
+// Limita el valor de agilidad a 99
+function limitarAgilidad() {
+  if (Number(agilidad.value) > 99) {
+    agilidad.value = '99'
+  }
+}
 
 function crear() {
   if (!nombre.value || !pais.value || !altura.value) return
