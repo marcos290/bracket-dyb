@@ -37,6 +37,13 @@ const profesion = ref('')
 const peso = ref('')
 const discapacidad = ref('')
 
+// Limita el valor de agilidad a 99
+function limitarAgilidad() {
+  if (Number(agilidad.value) > 99) {
+    agilidad.value = '99'
+  }
+}
+
 function crear() {
   if (!nombre.value || !pais.value || !altura.value) return
   emit('creado', {
