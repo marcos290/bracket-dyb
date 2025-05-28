@@ -17,7 +17,7 @@
     >👊 Volver a mi lucha</button>
 
     <!-- Bracket visual SOLO si mostrarBracket está activo o el usuario ha sido eliminado -->
-    <div v-if="(mostrarBracket && !usuarioEliminado) || usuarioEliminado" class="bracket-visual-vertical-container">
+    <div v-if="mostrarBracket || usuarioEliminado" class="bracket-visual-vertical-container">
       <div class="bracket-vertical">
         <div
           v-for="(ronda, rondaIdx) in [...bracket].reverse()"
@@ -152,47 +152,6 @@
         <p class="campeon-subtitle">¡Felicidades, has ganado el torneo mundial!</p>
       </div>
       <button class="close-campeon-btn" @click="reiniciar" title="Cerrar">✖</button>
-    </div>
-
-    <!-- Si el usuario ha sido eliminado, muestra el bracket y el ganador final -->
-    <div v-if="usuarioEliminado">
-      <div class="bracket-visual-vertical-container">
-        <div class="bracket-vertical">
-          <div
-            v-for="(ronda, rondaIdx) in [...bracket].reverse()"
-            :key="rondaIdx"
-            class="bracket-vertical-row"
-          >
-            <div
-              v-for="(luchador, i) in ronda"
-              :key="i"
-              class="bracket-vertical-cell"
-              :class="{
-                'bracket-user': luchador.esUsuario,
-                'bracket-winner': ganadorTorneo && luchador.nombre === ganadorTorneo.nombre
-              }"
-              @click="verStatsLuchador(luchador)"
-            >
-              <span class="bracket-flag">
-                <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
-                {{ luchador.bandera || '🏳️' }}
-              </span>
-              <div class="bracket-nombre">
-                {{ luchador.nombre }}
-                <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-winner-label">GANADOR</span>
-              </div>
-              <div
-                v-if="rondaIdx < bracket.length - 1"
-                class="bracket-vertical-line"
-                :style="{ height: `${getLineHeight(ronda.length)}px` }"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="usuario-eliminado-simple-msg">
-        Has sido eliminado del torneo
-      </div>
     </div>
   </div>
 </template>
@@ -901,9 +860,9 @@ function createConfetti() {
 /* Estilos del bracket mejorado */
 .bracket-visual-vertical-container {
   width: 95%;
-  max-width: 1600px;
+  max-width: 1400px;
   padding: 2rem;
-  margin: 0 auto;
+  margin: 2rem auto;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
   border-radius: 30px;
@@ -921,44 +880,59 @@ function createConfetti() {
 .bracket-vertical-row {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  position: relative;
-  min-width: 250px;
+  gap: 2rem;
+}
+
+.round-label {
+  text-align: center;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .bracket-match {
   position: relative;
-  margin: 1rem 0;
 }
 
 .bracket-pair {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
   position: relative;
 }
 
 .bracket-vertical-cell {
   background: rgba(30, 41, 59, 0.8);
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
-  min-width: 220px;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  min-width: 200px;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
   border: 1px solid rgba(99, 102, 241, 0.2);
-  position: relative;
-  cursor: pointer;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.bracket-vertical-cell:hover {
-  transform: translateX(5px);
-  background: rgba(30, 41, 59, 0.95);
+.bracket-vertical-cell.winner {
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(236, 72, 153, 0.2) 100%
+  );
+  border-color: rgba(99, 102, 241, 0.4);
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
-/* Líneas de conexión */
+.bracket-vertical-cell.eliminated {
+  opacity: 0.5;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Líneas de conexión mejoradas */
 .bracket-pair::after {
   content: '';
   position: absolute;
@@ -979,89 +953,9 @@ function createConfetti() {
   background: rgba(99, 102, 241, 0.5);
 }
 
-/* Estilo para luchadores eliminados */
-.bracket-vertical-cell.eliminated {
-  opacity: 0.5;
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-/* Estilo para ganadores de cada ronda */
-.bracket-vertical-cell.winner {
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.2) 0%,
-    rgba(236, 72, 153, 0.2) 100%
-  );
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
-}
-
-.bracket-flag {
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-}
-
-.bracket-nombre {
-  flex: 1;
-  font-weight: 600;
-  color: #e2e8f0;
-  font-size: 0.9rem;
-}
-
-.bracket-winner-label {
-  background: linear-gradient(45deg, #6366f1, #ec4899);
-  padding: 0.2rem 0.6rem;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  color: white;
-}
-
-.bracket-copa {
-  font-size: 1.2rem;
-  animation: trophyGlow 2s ease-in-out infinite alternate;
-}
-
-/* Etiquetas de ronda */
-.round-label {
-  text-align: center;
-  color: #e2e8f0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 1rem;
-  opacity: 0.7;
-}
-
-/* Animaciones */
-@keyframes trophyGlow {
-  from { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); }
-  to { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8)); }
-}
-
-@keyframes winnerPulse {
-  from { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-  to { box-shadow: 0 0 30px rgba(236, 72, 153, 0.4); }
-}
-
-/* Media queries */
 @media (max-width: 1200px) {
-  .fighters-row {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2rem;
-  }
-
-  .vs-center {
-    padding: 1rem;
-  }
-
-  .vs-text {
-    font-size: 4rem;
-  }
-
   .bracket-visual-vertical-container {
-    width: 95%;
+    width: 100%;
     padding: 1rem;
   }
 
@@ -1076,36 +970,15 @@ function createConfetti() {
 }
 
 @media (max-width: 768px) {
-  .fighter-list li {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 1rem;
-  }
-
-  .fighter-list li b {
-    min-width: 100%;
-    margin-bottom: 0.3rem;
-  }
-
-  .avatar-mini,
-  .avatar-mini-rival {
-    width: 120px;
-    height: 120px;
-  }
-
   .bracket-vertical {
     padding: 1rem;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .bracket-vertical-cell {
     min-width: 140px;
     font-size: 0.8rem;
-  }
-
-  .bracket-flag {
-    font-size: 1.2rem;
+    padding: 0.7rem 1rem;
   }
 }
 
