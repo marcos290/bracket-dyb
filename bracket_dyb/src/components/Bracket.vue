@@ -2,25 +2,79 @@
   <div class="bracket-bg main-container">
     <!-- Botón para cerrar el combate y ver el fondo -->
     <button 
-      v-if="combateIniciado && !combateTerminado" 
+      v-if="combateIniciado && !combateTerminado && !esCampeon" 
       class="close-combate-btn" 
-      @click="combateIniciado = false"
+      @click="mostrarBracket = true; combateIniciado = false"
       title="Cerrar combate"
     >✖</button>
 
-    <!-- Fondo de clasificación SOLO si no ha empezado el combate -->
-    <div v-if="!combateIniciado" class="champions-bracket-bg">
-      <div class="bracket-elim">
-        <div v-for="(ronda, idx) in rondas" :key="idx" class="bracket-elim-col">
-          <div v-for="(flag, i) in ronda" :key="i" class="bracket-elim-cell">
-            <span class="bracket-flag">{{ flag }}</span>
+    <!-- Botón para volver a la lucha del usuario -->
+    <button 
+      v-if="mostrarBracket && !esCampeon && !usuarioEliminado" 
+      class="volver-combate-btn"
+      @click="mostrarBracket = false; combateIniciado = true"
+      title="Volver a mi combate"
+    >👊 Volver a mi lucha</button>
+
+    <!-- Bracket visual SOLO si mostrarBracket está activo o el usuario ha sido eliminado -->
+    <div v-if="(mostrarBracket && !usuarioEliminado) || usuarioEliminado" class="bracket-visual-vertical-container">
+      <div class="bracket-vertical">
+        <div
+          v-for="(ronda, rondaIdx) in [...bracket].reverse()"
+          :key="rondaIdx"
+          class="bracket-vertical-row"
+        >
+          <div
+            v-for="(luchador, i) in ronda"
+            :key="i"
+            class="bracket-vertical-cell"
+            :class="{
+              'bracket-user': luchador.esUsuario,
+              'bracket-winner': ganadorTorneo && luchador.nombre === ganadorTorneo.nombre
+            }"
+            @click="verStatsLuchador(luchador)"
+          >
+            <span class="bracket-flag">
+              <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
+              {{ luchador.bandera || '🏳️' }}
+            </span>
+            <div class="bracket-nombre">
+              {{ luchador.nombre }}
+              <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-winner-label">GANADOR</span>
+            </div>
+            <!-- Línea vertical hacia arriba si no es la última ronda -->
+            <div
+              v-if="rondaIdx < bracket.length - 1"
+              class="bracket-vertical-line"
+              :style="{ height: `${getLineHeight(ronda.length)}px` }"
+            ></div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Modal de stats del luchador -->
+    <div v-if="luchadorStats" class="stats-modal">
+      <button class="close-stats-btn" @click="luchadorStats = null" title="Cerrar">✖</button>
+      <div class="stats-content">
+        <span class="stats-flag">{{ luchadorStats.bandera || '🏳️' }}</span>
+        <h2 class="stats-title">{{ luchadorStats.nombre }}</h2>
+        <ul class="stats-list">
+          <li><b>País:</b> {{ luchadorStats.pais }}</li>
+          <li><b>Altura:</b> {{ luchadorStats.altura }} cm</li>
+          <li><b>Peso:</b> {{ luchadorStats.peso }} kg</li>
+          <li><b>Press banca:</b> {{ luchadorStats.pressBanca }} kg</li>
+          <li><b>Agilidad:</b> {{ luchadorStats.agilidad }}</li>
+          <li><b>Objeto:</b> {{ luchadorStats.objeto }}</li>
+          <li><b>Habilidad con el objeto:</b> {{ luchadorStats.habilidad }}</li>
+          <li><b>Profesión:</b> {{ luchadorStats.profesion }}</li>
+          <li><b>Discapacidad:</b> {{ luchadorStats.discapacidad }}</li>
+        </ul>
+      </div>
+    </div>
+
     <!-- Botón para empezar a luchar -->
-    <div v-if="!combateIniciado" class="header-bar">
+    <div v-if="!combateIniciado && !mostrarBracket && !usuarioEliminado" class="header-bar">
       <h1 class="main-title">🏆 Torneo Mundial de Luchadores</h1>
       <button @click="combateIniciado = true" class="fight-btn">
         ¡Empezar a luchar!
@@ -28,7 +82,7 @@
     </div>
 
     <!-- Combate: solo los luchadores y el VS -->
-    <div v-if="combateIniciado && !combateTerminado && !esCampeon" class="fighters-row fighters-row-centered">
+    <div v-if="combateIniciado && !combateTerminado && !esCampeon && !mostrarBracket && !usuarioEliminado" class="fighters-row fighters-row-centered">
       <div class="fighter-card fighter-left">
         <div class="fighter-header-row">
           <img :src="avatarDefault" alt="Avatar" class="avatar-mini" />
@@ -70,14 +124,14 @@
       </div>
     </div>
     <!-- Botones y mensaje debajo de los luchadores -->
-    <div v-if="combateIniciado && !combateTerminado && !esCampeon" class="combate-actions-center combate-bajas-row">
+    <div v-if="combateIniciado && !combateTerminado && !esCampeon && !mostrarBracket && !usuarioEliminado" class="combate-actions-center combate-bajas-row">
       <span class="combate-bajas-msg">¿Te lo bajas?</span>
       <button class="combate-btn-tick" @click="siguienteRival">✅</button>
-      <button class="combate-btn-cross" @click="reiniciar">❌</button>
+      <button class="combate-btn-cross" @click="perderRival">❌</button>
     </div>
 
     <!-- Log y botones de avanzar o salir tras el combate -->
-    <div v-if="combateTerminado && !esCampeon" class="combate-post">
+    <div v-if="combateTerminado && !esCampeon && !mostrarBracket && !usuarioEliminado" class="combate-post">
       <ul class="combate-log">
         <li v-for="log in combateLog" :key="log" class="combate-log-item">{{ log }}</li>
       </ul>
@@ -96,11 +150,52 @@
         <p class="campeon-subtitle">¡Felicidades, has ganado el torneo mundial!</p>
       </div>
     </div>
+
+    <!-- Si el usuario ha sido eliminado, muestra el bracket y el ganador final -->
+    <div v-if="usuarioEliminado">
+      <div class="bracket-visual-vertical-container">
+        <div class="bracket-vertical">
+          <div
+            v-for="(ronda, rondaIdx) in [...bracket].reverse()"
+            :key="rondaIdx"
+            class="bracket-vertical-row"
+          >
+            <div
+              v-for="(luchador, i) in ronda"
+              :key="i"
+              class="bracket-vertical-cell"
+              :class="{
+                'bracket-user': luchador.esUsuario,
+                'bracket-winner': ganadorTorneo && luchador.nombre === ganadorTorneo.nombre
+              }"
+              @click="verStatsLuchador(luchador)"
+            >
+              <span class="bracket-flag">
+                <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
+                {{ luchador.bandera || '🏳️' }}
+              </span>
+              <div class="bracket-nombre">
+                {{ luchador.nombre }}
+                <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-winner-label">GANADOR</span>
+              </div>
+              <div
+                v-if="rondaIdx < bracket.length - 1"
+                class="bracket-vertical-line"
+                :style="{ height: `${getLineHeight(ronda.length)}px` }"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usuario-eliminado-simple-msg">
+        Has sido eliminado del torneo
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import avatarDefault from '../assets/avatar-default.png'
 
 const props = defineProps(['personaje'])
@@ -298,6 +393,95 @@ const combateLog = ref([])
 const ganador = ref(null)
 const combateIniciado = ref(false)
 const combateTerminado = ref(false)
+const mostrarBracket = ref(false)
+const rondaActual = ref(0)
+const bracket = ref([]) // Array de arrays, cada subarray es una ronda
+
+// Marca el usuario
+luchadores.value[0].esUsuario = true
+
+function generarBracketInicial() {
+  // Mezcla los luchadores y los coloca en el bracket
+  const mezclados = [...luchadores.value]
+  for (let i = mezclados.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[mezclados[i], mezclados[j]] = [mezclados[j], mezclados[i]]
+  }
+  bracket.value = [mezclados]
+  rondaActual.value = 0
+}
+onMounted(generarBracketInicial)
+
+const usuarioEliminado = ref(false)
+const ganadorTorneo = ref(null)
+
+// Modifica avanzarBracket para guardar el ganador si solo queda uno
+function avanzarBracket(usuarioPasa = false) {
+  const ronda = bracket.value[rondaActual.value]
+  const siguiente = []
+  for (let i = 0; i < ronda.length; i += 2) {
+    const a = ronda[i]
+    const b = ronda[i + 1]
+    if (!b) {
+      siguiente.push(a)
+      continue
+    }
+    // Si uno es el usuario y el usuario pasa
+    if (a.esUsuario && usuarioPasa) {
+      siguiente.push(a)
+    } else if (b.esUsuario && usuarioPasa) {
+      siguiente.push(b)
+    } else if (a.esUsuario || b.esUsuario) {
+      // Si el usuario NO pasa, no lo metemos en siguiente
+      // El rival pasa automáticamente
+      siguiente.push(a.esUsuario ? b : a)
+    } else {
+      // Gana el de mayor peso+altura
+      const sumaA = a.peso + a.altura
+      const sumaB = b.peso + b.altura
+      siguiente.push(sumaA >= sumaB ? a : b)
+    }
+  }
+  bracket.value.push(siguiente)
+  rondaActual.value++
+  // Si solo queda uno, es el ganador
+  if (siguiente.length === 1) {
+    ganadorTorneo.value = siguiente[0]
+  }
+}
+
+// Cuando el usuario gana su combate:
+function siguienteRival() {
+  combateTerminado.value = false
+  if (luchadores.value.length > 1) {
+    // El usuario pasa, avanza el bracket con usuarioPasa=true
+    avanzarBracket(true)
+    // Actualiza luchadores.value para el siguiente combate del usuario
+    const nuevaRonda = bracket.value[rondaActual.value]
+    // El usuario siempre es el primero en el array
+    luchadores.value.splice(0, luchadores.value.length, ...nuevaRonda)
+    if (luchadores.value.length === 1) {
+      ganador.value = personaje.value
+    }
+  }
+}
+
+// Cuando el usuario pierde su combate:
+function perderRival() {
+  usuarioEliminado.value = true
+  avanzarBracket(false)
+  // Elimina al usuario de luchadores.value para que no siga apareciendo en combates
+  const nuevaRonda = bracket.value[rondaActual.value]
+  luchadores.value.splice(0, luchadores.value.length, ...nuevaRonda)
+  avanzarHastaElFinal() // <-- AVANZA HASTA EL FINAL
+}
+
+function avanzarHastaElFinal() {
+  // Mientras no haya ganador, sigue avanzando el bracket
+  while (bracket.value[bracket.value.length - 1].length > 1) {
+    avanzarBracket(false)
+  }
+}
 
 const personaje = computed(() => luchadores.value[0])
 const rival = computed(() => luchadores.value[1])
@@ -324,19 +508,21 @@ function luchar() {
   combateTerminado.value = true
 }
 
-function siguienteRival() {
-  combateTerminado.value = false
-  if (luchadores.value.length > 1) {
-    // El usuario decide si gana, así que siempre pasa el personaje principal
-    luchadores.value.splice(1, 1)
-    if (luchadores.value.length === 1) {
-      ganador.value = personaje.value
-    }
-  }
-}
-
 function reiniciar() {
   window.location.reload()
+}
+
+const luchadorStats = ref(null)
+function verStatsLuchador(luchador) {
+  luchadorStats.value = luchador
+}
+
+function getLineHeight(numLuchadores) {
+  // Ajusta la altura de la línea según el número de luchadores en la ronda
+  if (numLuchadores <= 2) return 80;
+  if (numLuchadores <= 4) return 60;
+  if (numLuchadores <= 8) return 40;
+  return 30;
 }
 </script>
 
@@ -578,6 +764,31 @@ function reiniciar() {
   color: #fff;
   transform: scale(1.1);
 }
+.volver-combate-btn {
+  position: fixed;
+  top: 1.5rem;
+  left: 2rem;
+  z-index: 10;
+  font-size: 1.2rem;
+  background: #fff;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+.volver-combate-btn:hover {
+  background: #dbeafe;
+  color: #1e40af;
+  transform: scale(1.08);
+}
+.bracket-user {
+  border: 3px solid #facc15 !important;
+  background: #fef9c3 !important;
+  color: #b45309 !important;
+}
 .campeon-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -636,5 +847,273 @@ function reiniciar() {
   background: #fee2e2;
   color: #fff;
   transform: scale(1.1);
+}
+.bracket-visual-container {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  background: rgba(255,255,255,0.15);
+  pointer-events: auto;
+}
+.bracket-elim-visual-vertical {
+  position: relative;
+  width: 100%;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bracket-svg-lines {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.bracket-elim-rows-center {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 2;
+}
+.bracket-elim-row-visual {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+}
+.bracket-elim-cell-visual {
+  position: absolute;
+  left: 0;
+  width: 140px;
+  height: 90px;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px #0002;
+  padding: 0.7rem 1.2rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #2563eb;
+  border: 2px solid #93c5fd;
+  opacity: 0.97;
+  transition: border 0.2s, background 0.2s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.bracket-elim-cell-visual .bracket-flag {
+  font-size: 2rem;
+  display: block;
+}
+.bracket-elim-cell-visual .bracket-nombre {
+  font-size: 0.9em;
+  margin-top: 0.2em;
+  color: #222;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.bracket-elim-cell-visual.bracket-user {
+  border: 3px solid #facc15 !important;
+  background: #fef9c3 !important;
+  color: #b45309 !important;
+}
+.bracket-elim-cell-visual.bracket-winner {
+  border: 4px solid #16a34a !important;
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  box-shadow: 0 0 18px #16a34a88;
+  position: relative;
+}
+.bracket-copa {
+  font-size: 2rem;
+  margin-right: 0.2em;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 6px #facc15cc);
+}
+.bracket-winner-label {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  font-size: 0.8em;
+  font-weight: bold;
+  border-radius: 0.7em;
+  padding: 0.1em 0.7em;
+  margin-left: 0.5em;
+  margin-top: 0.2em;
+  letter-spacing: 0.04em;
+  box-shadow: 0 1px 6px #16a34a33;
+  vertical-align: middle;
+}
+.bracket-vertical-line {
+  position: absolute;
+  left: 50%;
+  top: -80%;
+  width: 3px;
+  background: #60a5fa;
+  z-index: 1;
+  transform: translateX(-50%);
+}
+.bracket-visual-vertical-container {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  background: rgba(255,255,255,0.15);
+  pointer-events: auto;
+}
+.bracket-vertical {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.5rem;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+}
+.bracket-vertical-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2.5rem;
+  min-height: 90px;
+  position: relative;
+}
+.bracket-vertical-cell {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px #0002;
+  padding: 0.7rem 1.2rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #2563eb;
+  border: 2px solid #93c5fd;
+  opacity: 0.97;
+  min-width: 120px;
+  min-height: 70px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  transition: border 0.2s, background 0.2s;
+}
+.bracket-vertical-cell .bracket-flag {
+  font-size: 2rem;
+  display: block;
+}
+.bracket-vertical-cell .bracket-nombre {
+  font-size: 0.9em;
+  margin-top: 0.2em;
+  color: #222;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.bracket-vertical-cell.bracket-user {
+  border: 3px solid #facc15 !important;
+  background: #fef9c3 !important;
+  color: #b45309 !important;
+}
+.bracket-vertical-cell.bracket-winner {
+  border: 4px solid #16a34a !important;
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  box-shadow: 0 0 18px #16a34a88;
+  position: relative;
+}
+.stats-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stats-content {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 6px 32px #0008;
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  max-width: 90vw;
+  position: relative;
+  animation: popStats 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes popStats {
+  0% { transform: scale(0.7); opacity: 0; }
+  80% { transform: scale(1.08);}
+  100% { transform: scale(1); opacity: 1;}
+}
+.stats-flag {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.stats-title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.stats-list {
+  font-size: 1.1rem;
+  color: #222;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.stats-list li {
+  margin-bottom: 0.4em;
+}
+.close-stats-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  font-size: 2rem;
+  background: #fff;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  z-index: 10001;
+}
+.close-stats-btn:hover {
+  background: #fee2e2;
+  color: #fff;
+  transform: scale(1.1);
+}
+.usuario-eliminado-simple-msg {
+  margin-top: 2.5rem;
+  font-size: 2rem;
+  color: #dc2626;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.03em;
 }
 </style>
