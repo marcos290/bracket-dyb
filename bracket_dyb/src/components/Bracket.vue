@@ -6,7 +6,7 @@
       class="close-combate-btn" 
       @click="mostrarBracket = true; combateIniciado = false"
       title="Cerrar combate"
-    >✖</button>
+    >Ir a la Clasificacion</button>
 
     <!-- Botón para volver a la lucha del usuario -->
     <button 
@@ -799,6 +799,29 @@ function isEliminated(luchador, rondaIdx) {
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-2px);
 }
+/* Botones de control y navegación */
+.volver-combate-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 0.8rem 1.5rem;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 9999;
+}
+
+.volver-combate-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
+}
 
 /* Contenedor de acciones centralizado */
 .combate-actions-container {
@@ -1040,5 +1063,140 @@ function isEliminated(luchador, rondaIdx) {
   .bracket-flag {
     font-size: 1.2rem;
   }
+}
+
+/* Modal de stats del luchador */
+.stats-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modalFadeIn 0.3s ease;
+}
+
+.close-stats-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.close-stats-btn:hover {
+  transform: rotate(90deg);
+  background: rgba(239, 68, 68, 0.3);
+  color: #fff;
+}
+
+/* Ajusta el padding del contenido para dar espacio al botón */
+.stats-content {
+  padding-top: 3rem;
+}
+
+.stats-content {
+  background: rgba(30, 41, 59, 0.95);
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 100px rgba(99, 102, 241, 0.15);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.stats-flag {
+  font-size: 3rem;
+  display: block;
+  text-align: center;
+  margin-bottom: 1rem;
+  animation: flagBounce 0.5s ease;
+}
+
+.stats-title {
+  color: #e2e8f0;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.stats-list li {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.stats-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.stats-list li b {
+  color: #818cf8;
+  min-width: 140px;
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Animaciones del modal */
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flagBounce {
+  0% { transform: scale(0.3); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 </style>
