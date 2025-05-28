@@ -6,12 +6,12 @@
         <div class="crear-form-col">
           <input v-model="nombre" placeholder="Nombre" class="crear-input" />
           <input v-model="pais" placeholder="País" class="crear-input" />
-          <input v-model="altura" placeholder="Altura (cm)" type="number" class="crear-input" />
-          <input v-model="peso" placeholder="Peso (kg)" type="number" class="crear-input" />
+          <input v-model="altura" placeholder="Altura (cm)" type="number" min="160" max="199" class="crear-input" />
+          <input v-model="peso" placeholder="Peso (kg)" type="number" min="50" max="150" class="crear-input" />
           </div>
         <div class="crear-form-col">
-          <input v-model="pressBanca" placeholder="Press banca (kg)" type="number" class="crear-input" />
-          <input v-model="agilidad" placeholder="Agilidad" type="number" class="crear-input" />
+          <input v-model="pressBanca" placeholder="Press banca (kg)" type="number" min="50" max="150" class="crear-input" />
+          <input v-model="agilidad" placeholder="Agilidad" type="number" min="0" max="100" class="crear-input" />
           <input v-model="profesion" placeholder="Profesión" class="crear-input" />
           <input v-model="discapacidad" placeholder="Discapacidad" class="crear-input" />
         </div>

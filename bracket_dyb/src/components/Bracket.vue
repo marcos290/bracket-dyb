@@ -33,8 +33,8 @@
           <li><b>Peso:</b> {{ personaje.peso }} kg</li>
           <li><b>Press banca:</b> {{ personaje.pressBanca }} kg</li>
           <li><b>Agilidad:</b> {{ personaje.agilidad }}</li>
-          <li><b>Objeto:</b> {{ personaje.objeto }}</li>
-          <li><b>Habilidad con el objeto:</b> {{ personaje.habilidad }}</li>
+          <li><b>Objeto:</b> {{ rival.objeto }}</li>
+          <li><b>Habilidad con el objeto:</b> {{ rival.habilidad }}</li>
           <li><b>Profesión:</b> {{ personaje.profesion }}</li>
           <li><b>Discapacidad:</b> {{ personaje.discapacidad }}</li>
         </ul>
