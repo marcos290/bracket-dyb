@@ -1,5 +1,13 @@
 <template>
   <div class="bracket-bg main-container">
+    <!-- Botón para cerrar el combate y ver el fondo -->
+    <button 
+      v-if="combateIniciado && !combateTerminado" 
+      class="close-combate-btn" 
+      @click="combateIniciado = false"
+      title="Cerrar combate"
+    >✖</button>
+
     <!-- Fondo de clasificación SOLO si no ha empezado el combate -->
     <div v-if="!combateIniciado" class="champions-bracket-bg">
       <div class="bracket-elim">
@@ -20,7 +28,7 @@
     </div>
 
     <!-- Combate: solo los luchadores y el VS -->
-    <div v-if="combateIniciado && !combateTerminado" class="fighters-row fighters-row-centered">
+    <div v-if="combateIniciado && !combateTerminado && !esCampeon" class="fighters-row fighters-row-centered">
       <div class="fighter-card fighter-left">
         <div class="fighter-header-row">
           <img :src="avatarDefault" alt="Avatar" class="avatar-mini" />
@@ -62,20 +70,30 @@
       </div>
     </div>
     <!-- Botones y mensaje debajo de los luchadores -->
-    <div v-if="combateIniciado && !combateTerminado" class="combate-actions-center combate-bajas-row">
+    <div v-if="combateIniciado && !combateTerminado && !esCampeon" class="combate-actions-center combate-bajas-row">
       <span class="combate-bajas-msg">¿Te lo bajas?</span>
       <button class="combate-btn-tick" @click="siguienteRival">✅</button>
       <button class="combate-btn-cross" @click="reiniciar">❌</button>
     </div>
 
     <!-- Log y botones de avanzar o salir tras el combate -->
-    <div v-if="combateTerminado" class="combate-post">
+    <div v-if="combateTerminado && !esCampeon" class="combate-post">
       <ul class="combate-log">
         <li v-for="log in combateLog" :key="log" class="combate-log-item">{{ log }}</li>
       </ul>
       <div class="combate-actions">
         <button class="combate-btn-tick" @click="siguienteRival">✅</button>
         <button class="combate-btn-cross" @click="reiniciar">❌</button>
+      </div>
+    </div>
+
+    <!-- Cartel de CAMPEÓN -->
+    <div v-if="esCampeon" class="campeon-modal">
+      <button class="close-campeon-btn" @click="reiniciar" title="Cerrar">✖</button>
+      <div class="campeon-content">
+        <span class="campeon-copa">🏆</span>
+        <h2 class="campeon-title">¡{{ personaje.nombre }} es el CAMPEÓN!</h2>
+        <p class="campeon-subtitle">¡Felicidades, has ganado el torneo mundial!</p>
       </div>
     </div>
   </div>
@@ -164,10 +182,15 @@ const profesiones = [
 ]
 const generarProfesion = () => profesiones[Math.floor(Math.random() * profesiones.length)]
 
-const objetos = [
+const objetos = [ 
   'Sin objetos', 'Desatascador', 'Cepillo de dientes', 'Cuchillo', 'Bate', 'Sartén', 'Pala', 'Peluche', 'Libro', 'Ladrillo',
-  'Cuerda', 'Taza', 'Regla', 'Martillo', 'Destornillador', 'Bolso', 'Sombrero', 'Piedra', 'Cuchara', 'Escoba', 'Calcetín', 'Palo selfie'
-]
+  'Cuerda', 'Taza', 'Regla', 'Martillo', 'Destornillador', 'Bolso', 'Sombrero', 'Piedra', 'Cuchara', 'Escoba', 'Calcetín', 'Palo selfie',
+  'Almohada', 'Linterna', 'Pelota', 'Botella', 'Paraguas', 'Cascabel', 'Cinta adhesiva', 'Cubo', 'Espejo', 'Zapatilla',
+  'Candelabro', 'Teléfono viejo', 'Llave inglesa', 'Cuaderno', 'Cacerola', 'Estuche', 'Cinta métrica', 'Gafas de sol', 'Juguete', 'Percha',
+  'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el pelo', 'Toalla', 'Globo', 'Alambre',
+  'Dildo de Goma Rosa de 30 cm' ,'Muñeca inchable','Porro', 'Bastón de madera', 'Cinturón de castidad', 'Pipa de agua', 'Bola de bolos', 'Cuchara de palo', 'Escudo medieval',
+];
+
 const generarObjeto = () => objetos[Math.floor(Math.random() * objetos.length)]
 
 const discapacidades = [
@@ -278,6 +301,9 @@ const combateTerminado = ref(false)
 
 const personaje = computed(() => luchadores.value[0])
 const rival = computed(() => luchadores.value[1])
+
+// Detecta si ya eres campeón
+const esCampeon = computed(() => luchadores.value.length === 1 && ganador.value)
 
 const rondas = [
   // Octavos (16)
@@ -530,5 +556,85 @@ function reiniciar() {
   border: 2px solid #eb2525;
   background: #fff;
   box-shadow: 0 1px 4px #0001;
+}
+.close-combate-btn {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 10;
+  font-size: 2.2rem;
+  background: #fff;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 2.7rem;
+  height: 2.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+.close-combate-btn:hover {
+  background: #fee2e2;
+  color: #fff;
+  transform: scale(1.1);
+}
+.campeon-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.campeon-content {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 6px 32px #0005;
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 320px;
+}
+.campeon-copa {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 12px #facc15aa;
+}
+.campeon-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #f59e42;
+  margin-bottom: 0.7rem;
+  text-shadow: 0 2px 12px #facc15aa;
+  text-align: center;
+}
+.campeon-subtitle {
+  font-size: 1.2rem;
+  color: #2563eb;
+  text-align: center;
+}
+.close-campeon-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  font-size: 2rem;
+  background: #fff;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  z-index: 101;
+}
+.close-campeon-btn:hover {
+  background: #fee2e2;
+  color: #fff;
+  transform: scale(1.1);
 }
 </style>
