@@ -153,6 +153,36 @@
       </div>
       <button class="close-campeon-btn" @click="reiniciar" title="Cerrar">✖</button>
     </div>
+
+    <!-- Modal de ganador cuando pierde el usuario -->
+    <div v-if="ganadorTorneo && usuarioEliminado" class="ganador-modal">
+      <div class="ganador-content">
+        <button 
+          class="close-ganador-btn" 
+          @click="mostrarModalGanador = false; mostrarBracket = true" 
+          title="Ver bracket final"
+        >✖</button>
+        <div class="ganador-header">
+          <span class="ganador-copa">🏆</span>
+          <h2 class="ganador-title">¡{{ ganadorTorneo.nombre }} es el CAMPEÓN!</h2>
+        </div>
+        <div class="ganador-info">
+          <span class="ganador-flag">{{ ganadorTorneo.bandera }}</span>
+          <ul class="ganador-stats-list">
+            <li><b>País:</b> {{ ganadorTorneo.pais }}</li>
+            <li><b>Altura:</b> {{ ganadorTorneo.altura }} cm</li>
+            <li><b>Peso:</b> {{ ganadorTorneo.peso }} kg</li>
+            <li><b>Press banca:</b> {{ ganadorTorneo.pressBanca }} kg</li>
+            <li><b>Agilidad:</b> {{ ganadorTorneo.agilidad }}</li>
+            <li><b>Objeto:</b> {{ ganadorTorneo.objeto }}</li>
+            <li><b>Habilidad con el objeto:</b> {{ ganadorTorneo.habilidad }}</li>
+            <li><b>Profesión:</b> {{ ganadorTorneo.profesion }}</li>
+            <li><b>Discapacidad:</b> {{ ganadorTorneo.discapacidad }}</li>
+          </ul>
+        </div>
+        <p class="ganador-subtitle">¡Ha conquistado el torneo mundial!</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -209,10 +239,6 @@ const nombresBase = [
   'Raúl', 'Patricia', 'Rubén', 'Isabel', 'Sergio', 'Cristina', 'Álvaro', 'María', 'Iván', 'Beatriz',
   'Hugo', 'Nuria', 'Pablo', 'Silvia', 'Mario', 'Rosa', 'Daniel', 'Eva', 'Alejandro', 'Julia',
   'Francisco', 'Teresa', 'Antonio', 'Natalia', 'José', 'Mónica', 'Guillermo', 'Lorena', 'Samuel', 'Clara',
-  'Óscar', 'Patricio', 'Esteban', 'Alicia', 'Gabriel', 'Noelia', 'Tomás', 'Andrea', 'Emilio', 'Victoria',
-  'Ángel', 'Sandra', 'Adrián', 'Irene', 'Enrique', 'Raquel', 'Felipe', 'Gloria', 'Joaquín', 'Verónica',
-  'Eduardo', 'Rocío', 'Fernando', 'Miriam', 'Jorge', 'Aitana', 'Luis', 'Lidia', 'Saúl', 'Elsa',
-  'Martín', 'Ainhoa', 'Bruno', 'Berta', 'Mateo', 'Ariadna', 'Lucas', 'Jimena', 'Marcos', 'Olga',
   'Iván', 'Esther', 'Dario', 'Carla', 'Julio', 'Lara', 'Sebastián', 'Aina', 'Ricardo', 'Nerea'
 ]
 const sexos = ['Masculino', 'Femenino']
@@ -244,7 +270,7 @@ const objetos = [
   'Cuerda', 'Taza', 'Regla', 'Martillo', 'Destornillador', 'Bolso', 'Sombrero', 'Piedra', 'Cuchara', 'Escoba', 'Calcetín', 'Palo selfie',
   'Almohada', 'Linterna', 'Pelota', 'Botella', 'Paraguas', 'Cascabel', 'Cinta adhesiva', 'Cubo', 'Espejo', 'Zapatilla',
   'Candelabro', 'Teléfono viejo', 'Llave inglesa', 'Cuaderno', 'Cacerola', 'Estuche', 'Cinta métrica', 'Gafas de sol', 'Juguete', 'Percha',
-  'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el pelo', 'Toalla', 'Globo', 'Alambre',
+  'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el
   'Dildo de Goma Rosa de 30 cm' ,'Muñeca inchable','Porro', 'Bastón de madera', 'Cinturón de castidad', 'Pipa de agua', 'Bola de bolos', 'Cuchara de palo', 'Escudo medieval',
 ];
 
@@ -1164,144 +1190,170 @@ function createConfetti() {
   animation: fadeInUp 0.6s ease forwards 0.3s;
 }
 
-/* Confeti */
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: var(--color);
-  animation: confettiFall var(--duration) ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* Estilo para el confetti en forma de pieza */
-.confetti-piece {
-  position: absolute;
-  width: 10px;
-  height: 20px;
+/* Estilo para el modal del ganador */
+.ganador-modal {
+  position: fixed;
   top: 0;
-  opacity: 0;
-  animation: confettiRain 3s ease-in infinite;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modalFadeIn 0.3s ease;
 }
 
-.confetti-piece:nth-child(odd) {
-  background-image: linear-gradient(to right, #6366f1, #ec4899);
+.ganador-content {
+  background: rgba(30, 41, 59, 0.95);
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 500px; /* Mantenemos el mismo max-width que stats-content */
+  position: relative;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 100px rgba(99, 102, 241, 0.2);
+  animation: celebrationPop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.confetti-piece:nth-child(even) {
-  background-image: linear-gradient(to right, #fbbf24, #34d399);
-}
-
-@keyframes confettiRain {
-  0% {
-    opacity: 1;
-    transform: translateY(0) rotateX(0) rotateY(0);
-  }
-  
-  100% {
-    opacity: 0;
-    transform: translateY(100vh) rotateX(90deg) rotateY(180deg);
-  }
-}
-
-/* Botón de cerrar mejorado */
-.close-campeon-btn {
+.close-ganador-btn {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
   z-index: 1;
 }
 
-.close-campeon-btn:hover {
-  transform: rotate(90deg) scale(1.1);
+.close-ganador-btn:hover {
+  transform: rotate(90deg);
   background: rgba(239, 68, 68, 0.3);
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  color: #fff;
 }
 
-/* Animaciones */
-@keyframes celebrationBg {
-  0%, 100% { background-color: rgba(15, 23, 42, 0.9); }
-  50% { background-color: rgba(15, 23, 42, 0.95); }
+.ganador-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-@keyframes celebrationPop {
-  0% { 
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  50% { transform: scale(1.1); }
-  100% { 
-    transform: scale(1);
-    opacity: 1;
-  }
+.ganador-copa {
+  font-size: 4rem; /* Reducido de 5rem */
+  display: block;
+  margin-bottom: 0.5rem; /* Reducido de 1rem */
 }
 
-@keyframes trophyDance {
-  0%, 100% { 
-    transform: translateY(0) rotate(0deg);
-    filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5));
-  }
-  50% { 
-    transform: translateY(-20px) rotate(5deg);
-    filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.8));
-  }
+.ganador-title {
+  font-size: 2rem; /* Reducido de 2.5rem */
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 3s linear infinite;
 }
 
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.ganador-info {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem; /* Reducido de 2rem */
+  margin: 1.5rem 0; /* Reducido de 2rem */
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-@keyframes shimmerEffect {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+.ganador-flag {
+  font-size: 2.5rem; /* Reducido de 3rem */
+  margin-bottom: 1rem; /* Reducido de 1.5rem */
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ganador-stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
 }
 
-@keyframes confettiFall {
-  0% { transform: translateY(-100vh) rotate(0deg); }
-  100% { transform: translateY(100vh) rotate(360deg); }
+.ganador-stats-list li {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.7rem 1rem; /* Reducido de 0.8rem 1.2rem */
+  border-radius: 12px;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
-/* Media queries */
+.ganador-stats-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.ganador-stats-list li b {
+  color: #818cf8;
+  min-width: 140px;
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ganador-subtitle {
+  font-size: 1rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 1.5rem 0 0 0;
+  padding: 0.8rem 1.5rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 100px;
+  display: inline-block;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  animation: fadeInUp 0.6s ease forwards 0.3s;
+}
+
+.ganador-subtitle::before {
+  content: '👑';
+  margin-right: 0.5rem;
+  animation: crownBounce 1s ease infinite;
+}
+
+@keyframes crownBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 @media (max-width: 768px) {
-  .campeon-content {
+  .ganador-content {
     padding: 2rem;
   }
-
-  .campeon-copa {
-    font-size: 6rem;
+  
+  .ganador-title {
+    font-size: 2rem;
   }
-
-  .campeon-title {
-    font-size: 2.5rem;
+  
+  .ganador-copa {
+    font-size: 4rem;
   }
-
-  .campeon-subtitle {
-    font-size: 1.2rem;
+  
+  .ganador-stats-list li {
+    padding: 0.6rem 1rem;
   }
 }
 </style>
