@@ -1,7 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-100 text-gray-800 flex items-center justify-center">
-    <CrearPersonaje v-if="!personaje" @creado="personaje = $event" />
-    <Bracket v-else :personaje="personaje" />
+    <Portada v-if="!iniciado" @iniciar="iniciado = true" />
+    <template v-else>
+      <CrearPersonaje v-if="!personaje" @creado="personaje = $event" />
+      <Bracket v-else :personaje="personaje" />
+    </template>
   </div>
 </template>
 
@@ -9,7 +12,9 @@
 import { ref } from 'vue'
 import Bracket from './components/Bracket.vue'
 import CrearPersonaje from './components/CrearPersonaje.vue'
+import Portada from './components/Portada.vue'
 
+const iniciado = ref(false)
 const personaje = ref(null)
 </script>
 
