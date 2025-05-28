@@ -24,30 +24,33 @@
           :key="rondaIdx"
           class="bracket-vertical-row"
         >
-          <div
-            v-for="(luchador, i) in ronda"
-            :key="i"
-            class="bracket-vertical-cell"
-            :class="{
-              'bracket-user': luchador.esUsuario,
-              'bracket-winner': ganadorTorneo && luchador.nombre === ganadorTorneo.nombre
-            }"
-            @click="verStatsLuchador(luchador)"
-          >
-            <span class="bracket-flag">
-              <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
-              {{ luchador.bandera || '🏳️' }}
-            </span>
-            <div class="bracket-nombre">
-              {{ luchador.nombre }}
-              <span v-if="ganadorTorneo && luchador.nombre === ganadorTorneo.nombre" class="bracket-winner-label">GANADOR</span>
+          <div class="round-label">
+            {{ getRoundName(ronda.length) }}
+          </div>
+          
+          <div v-for="(par, parIdx) in getPares(ronda)" :key="parIdx" class="bracket-match">
+            <div class="bracket-pair">
+              <div 
+                v-for="luchador in par" 
+                :key="luchador?.nombre"
+                class="bracket-vertical-cell"
+                :class="{
+                  'bracket-user': luchador?.esUsuario,
+                  'winner': isWinner(luchador, rondaIdx),
+                  'eliminated': isEliminated(luchador, rondaIdx)
+                }"
+                @click="luchador && verStatsLuchador(luchador)"
+              >
+                <span class="bracket-flag">
+                  <span v-if="ganadorTorneo && luchador?.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
+                  {{ luchador?.bandera || '🏳️' }}
+                </span>
+                <span class="bracket-nombre">{{ luchador?.nombre || 'TBD' }}</span>
+                <span v-if="ganadorTorneo && luchador?.nombre === ganadorTorneo.nombre" class="bracket-winner-label">
+                  CAMPEÓN
+                </span>
+              </div>
             </div>
-            <!-- Línea vertical hacia arriba si no es la última ronda -->
-            <div
-              v-if="rondaIdx < bracket.length - 1"
-              class="bracket-vertical-line"
-              :style="{ height: `${getLineHeight(ronda.length)}px` }"
-            ></div>
           </div>
         </div>
       </div>
@@ -524,6 +527,37 @@ function getLineHeight(numLuchadores) {
   if (numLuchadores <= 8) return 40;
   return 30;
 }
+
+// Funciones helper para el bracket
+function getRoundName(numLuchadores) {
+  switch(numLuchadores) {
+    case 1: return 'Campeón';
+    case 2: return 'Final';
+    case 4: return 'Semifinales';
+    case 8: return 'Cuartos';
+    default: return `Ronda de ${numLuchadores}`;
+  }
+}
+
+function getPares(ronda) {
+  const pares = [];
+  for (let i = 0; i < ronda.length; i += 2) {
+    pares.push([ronda[i], ronda[i + 1]]);
+  }
+  return pares;
+}
+
+function isWinner(luchador, rondaIdx) {
+  if (!luchador) return false;
+  const siguienteRonda = bracket.value[rondaIdx - 1];
+  return siguienteRonda?.some(l => l.nombre === luchador.nombre);
+}
+
+function isEliminated(luchador, rondaIdx) {
+  if (!luchador) return false;
+  const siguienteRonda = bracket.value[rondaIdx - 1];
+  return !siguienteRonda?.some(l => l.nombre === luchador.nombre);
+}
 </script>
 
 <style scoped>
@@ -797,6 +831,152 @@ function getLineHeight(numLuchadores) {
   font-size: 1.8rem;
 }
 
+/* Estilos del bracket mejorado */
+.bracket-visual-vertical-container {
+  width: 95%;
+  max-width: 1600px;
+  padding: 2rem;
+  margin: 0 auto;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  overflow: auto;
+}
+
+.bracket-vertical {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  gap: 4rem;
+}
+
+.bracket-vertical-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: relative;
+  min-width: 250px;
+}
+
+.bracket-match {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.bracket-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.bracket-vertical-cell {
+  background: rgba(30, 41, 59, 0.8);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bracket-vertical-cell:hover {
+  transform: translateX(5px);
+  background: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* Líneas de conexión */
+.bracket-pair::after {
+  content: '';
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  width: 2rem;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.5);
+}
+
+.bracket-pair::before {
+  content: '';
+  position: absolute;
+  right: -2rem;
+  top: 25%;
+  height: 50%;
+  width: 2px;
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* Estilo para luchadores eliminados */
+.bracket-vertical-cell.eliminated {
+  opacity: 0.5;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Estilo para ganadores de cada ronda */
+.bracket-vertical-cell.winner {
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(236, 72, 153, 0.2) 100%
+  );
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.bracket-flag {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.bracket-nombre {
+  flex: 1;
+  font-weight: 600;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.bracket-winner-label {
+  background: linear-gradient(45deg, #6366f1, #ec4899);
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  color: white;
+}
+
+.bracket-copa {
+  font-size: 1.2rem;
+  animation: trophyGlow 2s ease-in-out infinite alternate;
+}
+
+/* Etiquetas de ronda */
+.round-label {
+  text-align: center;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+/* Animaciones */
+@keyframes trophyGlow {
+  from { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); }
+  to { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8)); }
+}
+
+@keyframes winnerPulse {
+  from { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+  to { box-shadow: 0 0 30px rgba(236, 72, 153, 0.4); }
+}
+
 /* Media queries */
 @media (max-width: 1200px) {
   .fighters-row {
@@ -811,6 +991,20 @@ function getLineHeight(numLuchadores) {
 
   .vs-text {
     font-size: 4rem;
+  }
+
+  .bracket-visual-vertical-container {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .bracket-vertical {
+    gap: 2rem;
+  }
+
+  .bracket-vertical-cell {
+    min-width: 160px;
+    padding: 0.8rem 1rem;
   }
 }
 
@@ -831,6 +1025,20 @@ function getLineHeight(numLuchadores) {
   .avatar-mini-rival {
     width: 120px;
     height: 120px;
+  }
+
+  .bracket-vertical {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .bracket-vertical-cell {
+    min-width: 140px;
+    font-size: 0.8rem;
+  }
+
+  .bracket-flag {
+    font-size: 1.2rem;
   }
 }
 </style>
