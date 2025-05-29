@@ -245,6 +245,7 @@ const nombresBase = [
   'Martín', 'Ainhoa', 'Bruno', 'Berta', 'Mateo', 'Ariadna', 'Lucas', 'Jimena', 'Marcos', 'Olga',
   'Iván', 'Esther', 'Dario', 'Carla', 'Julio', 'Lara', 'Sebastián', 'Aina', 'Ricardo', 'Nerea'
 ]
+
 const sexos = ['Masculino', 'Femenino']
 
 const generarNombre = () => nombresBase[Math.floor(Math.random() * nombresBase.length)]
