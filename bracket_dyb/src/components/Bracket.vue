@@ -145,21 +145,21 @@
     </div>
 
     <!-- Cartel de CAMPEÓN -->
-    <div v-if="esCampeon" class="campeon-modal" @mounted="createConfetti">
+    <div v-if="esCampeon && mostrarModalCampeon" class="campeon-modal" @mounted="createConfetti">
       <div class="campeon-content">
         <span class="campeon-copa">🏆</span>
         <h2 class="campeon-title">¡{{ personaje.nombre }} es el CAMPEÓN!</h2>
         <p class="campeon-subtitle">¡Felicidades, has ganado el torneo mundial!</p>
       </div>
-      <button class="close-campeon-btn" @click="reiniciar" title="Cerrar">✖</button>
+      <button class="close-campeon-btn" @click="mostrarModalCampeon = false" title="Cerrar">✖</button>
     </div>
 
     <!-- Modal de ganador cuando pierde el usuario -->
-    <div v-if="ganadorTorneo && usuarioEliminado" class="ganador-modal">
+    <div v-if="ganadorTorneo && usuarioEliminado && mostrarModalGanador" class="ganador-modal">
       <div class="ganador-content">
         <button 
           class="close-ganador-btn" 
-          @click="mostrarModalGanador = false; mostrarBracket = true" 
+          @click="mostrarModalGanador = false"
           title="Ver bracket final"
         >✖</button>
         <div class="ganador-header">
@@ -181,6 +181,53 @@
           </ul>
         </div>
         <p class="ganador-subtitle">¡Ha conquistado el torneo mundial!</p>
+      </div>
+    </div>
+
+    <!-- Bracket final y botón de reinicio tras ganar o perder -->
+    <div v-if="(esCampeon && !mostrarModalCampeon) || (usuarioEliminado && !mostrarModalGanador)">
+      <button class="reiniciar-bracket-btn reiniciar-bracket-btn-fixed" @click="reiniciar">
+        🔄 Reiniciar Bracket
+      </button>
+      <div class="bracket-visual-vertical-container">
+        <div class="bracket-vertical">
+          <div
+            v-for="(ronda, rondaIdx) in [...bracket].reverse()"
+            :key="rondaIdx"
+            class="bracket-vertical-row"
+          >
+            <div class="round-label">
+              {{ getRoundName(ronda.length) }}
+            </div>
+            <div v-for="(par, parIdx) in getPares(ronda)" :key="parIdx" class="bracket-match">
+              <div class="bracket-pair">
+                <div 
+                  v-for="luchador in par" 
+                  :key="luchador?.nombre"
+                  class="bracket-vertical-cell"
+                  :class="{
+                    'bracket-user': luchador?.esUsuario,
+                    'winner': isWinner(luchador, rondaIdx),
+                    'eliminated': isEliminated(luchador, rondaIdx)
+                  }"
+                  @click="luchador && verStatsLuchador(luchador)"
+                >
+                  <span class="bracket-flag">
+                    <span v-if="ganadorTorneo && luchador?.nombre === ganadorTorneo.nombre" class="bracket-copa">🏆</span>
+                    {{ luchador?.bandera || '🏳️' }}
+                  </span>
+                  <span class="bracket-nombre">{{ luchador?.nombre || 'TBD' }}</span>
+                  <span v-if="ganadorTorneo && luchador?.nombre === ganadorTorneo.nombre" class="bracket-winner-label">
+                    CAMPEÓN
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="usuarioEliminado" class="usuario-eliminado-simple-msg">
+        Has sido eliminado del torneo
       </div>
     </div>
   </div>
@@ -233,18 +280,6 @@ function generarPaisProb() {
   return paisesProb[paisesProb.length - 1]
 }
 
-const nombresBase = [
-  'Carlos', 'Luisa', 'Pedro', 'Sofía', 'Andrés', 'Marta', 'Juan', 'Laura', 'Diego', 'Ana',
-  'Miguel', 'Lucía', 'David', 'Paula', 'Javier', 'Sara', 'Alberto', 'Elena', 'Manuel', 'Carmen',
-  'Raúl', 'Patricia', 'Rubén', 'Isabel', 'Sergio', 'Cristina', 'Álvaro', 'María', 'Iván', 'Beatriz',
-  'Hugo', 'Nuria', 'Pablo', 'Silvia', 'Mario', 'Rosa', 'Daniel', 'Eva', 'Alejandro', 'Julia',
-  'Francisco', 'Teresa', 'Antonio', 'Natalia', 'José', 'Mónica', 'Guillermo', 'Lorena', 'Samuel', 'Clara',
-  'Óscar', 'Patricio', 'Esteban', 'Alicia', 'Gabriel', 'Noelia', 'Tomás', 'Andrea', 'Emilio', 'Victoria',
-  'Ángel', 'Sandra', 'Adrián', 'Irene', 'Enrique', 'Raquel', 'Felipe', 'Gloria', 'Joaquín', 'Verónica',
-  'Eduardo', 'Rocío', 'Fernando', 'Miriam', 'Jorge', 'Aitana', 'Luis', 'Lidia', 'Saúl', 'Elsa',
-  'Martín', 'Ainhoa', 'Bruno', 'Berta', 'Mateo', 'Ariadna', 'Lucas', 'Jimena', 'Marcos', 'Olga',
-  'Iván', 'Esther', 'Dario', 'Carla', 'Julio', 'Lara', 'Sebastián', 'Aina', 'Ricardo', 'Nerea'
-]
 
 const sexos = ['Masculino', 'Femenino']
 
@@ -302,30 +337,30 @@ function generarDiscapacidadProb() {
 const luchadores = ref([])
 
 const nombresPorPais = {
-  'China': ['Wei', 'Li', 'Wang', 'Zhang', 'Chen', 'Liu', 'Yang', 'Huang', 'Zhao', 'Wu', 'Xu', 'Sun', 'Ma', 'Zhou', 'Gao'],
-  'India': ['Amit', 'Priya', 'Rahul', 'Anjali', 'Vijay', 'Sunita', 'Raj', 'Pooja', 'Sanjay', 'Neha', 'Arjun', 'Rani', 'Deepak', 'Kiran', 'Manoj'],
-  'EE. UU.': ['John', 'Emily', 'Michael', 'Jessica', 'David', 'Ashley', 'James', 'Sarah', 'Robert', 'Amanda', 'William', 'Jennifer', 'Matthew', 'Elizabeth', 'Joshua'],
-  'Indonesia': ['Agus', 'Siti', 'Budi', 'Dewi', 'Joko', 'Putri', 'Rizki', 'Fitri', 'Andi', 'Nur', 'Yusuf', 'Sri', 'Hendra', 'Rina', 'Dian'],
-  'Pakistán': ['Ali', 'Fatima', 'Ahmed', 'Ayesha', 'Hassan', 'Sana', 'Imran', 'Zainab', 'Bilal', 'Maryam', 'Usman', 'Sara', 'Hamza', 'Rabia', 'Kashif'],
-  'Nigeria': ['Emeka', 'Ngozi', 'Chinedu', 'Amina', 'Ifeanyi', 'Bola', 'Uche', 'Chika', 'Tunde', 'Ada', 'Segun', 'Kemi', 'Yemi', 'Amaka', 'Sola'],
-  'Brasil': ['João', 'Maria', 'Pedro', 'Ana', 'Lucas', 'Juliana', 'Gabriel', 'Camila', 'Mateus', 'Larissa', 'Felipe', 'Beatriz', 'Rafael', 'Fernanda', 'Bruno'],
-  'Bangladés': ['Abir', 'Sumaiya', 'Hasan', 'Nusrat', 'Sabbir', 'Mitu', 'Rafi', 'Tania', 'Shuvo', 'Rima', 'Sakib', 'Mou', 'Tanvir', 'Jannat', 'Rasel'],
-  'Rusia': ['Ivan', 'Anna', 'Dmitry', 'Olga', 'Sergey', 'Elena', 'Alexey', 'Natalia', 'Vladimir', 'Tatiana', 'Andrey', 'Ekaterina', 'Mikhail', 'Irina', 'Nikita'],
-  'México': ['Juan', 'María', 'José', 'Guadalupe', 'Luis', 'Ana', 'Carlos', 'Carmen', 'Jorge', 'Patricia', 'Miguel', 'Verónica', 'Francisco', 'Leticia', 'Ricardo'],
-  'Japón': ['Haruto', 'Yui', 'Sota', 'Rin', 'Yuto', 'Sakura', 'Yuki', 'Hina', 'Kaito', 'Mio', 'Ren', 'Yuna', 'Daiki', 'Aoi', 'Takumi'],
-  'Filipinas': ['Jose', 'Maria', 'Juan', 'Angel', 'Mark', 'Grace', 'Paul', 'Joy', 'James', 'Rose', 'Michael', 'Ann', 'John', 'May', 'Anthony'],
-  'Egipto': ['Mohamed', 'Fatma', 'Ahmed', 'Sara', 'Omar', 'Mona', 'Youssef', 'Aya', 'Mahmoud', 'Nour', 'Mostafa', 'Salma', 'Khaled', 'Heba', 'Tamer'],
-  'Etiopía': ['Abebe', 'Alem', 'Kebede', 'Mulu', 'Tsegaye', 'Hana', 'Bekele', 'Selam', 'Getachew', 'Almaz', 'Tesfaye', 'Mekdes', 'Haile', 'Tigist', 'Solomon'],
-  'Vietnam': ['Nguyen', 'Anh', 'Tran', 'Hoa', 'Le', 'Huong', 'Phuong', 'Minh', 'Thu', 'Quang', 'Tuan', 'Hang', 'Duc', 'Linh', 'Son'],
-  'Alemania': ['Lukas', 'Sophie', 'Leon', 'Marie', 'Finn', 'Anna', 'Paul', 'Laura', 'Jonas', 'Lea', 'Ben', 'Lena', 'Elias', 'Mia', 'Maximilian'],
-  'Irán': ['Mohammad', 'Fatemeh', 'Ali', 'Zahra', 'Reza', 'Maryam', 'Hossein', 'Sara', 'Mehdi', 'Narges', 'Amir', 'Arezoo', 'Saeed', 'Shirin', 'Hassan'],
-  'Turquía': ['Mehmet', 'Fatma', 'Mustafa', 'Ayşe', 'Ahmet', 'Emine', 'Ali', 'Hatice', 'Hüseyin', 'Zeynep', 'Hasan', 'Elif', 'İbrahim', 'Merve', 'Osman'],
-  'Francia': ['Lucas', 'Emma', 'Nathan', 'Chloé', 'Enzo', 'Manon', 'Louis', 'Léa', 'Hugo', 'Camille', 'Gabriel', 'Sarah', 'Arthur', 'Inès', 'Jules'],
-  'Reino Unido': ['Oliver', 'Olivia', 'George', 'Emily', 'Harry', 'Jessica', 'Jack', 'Sophie', 'Jacob', 'Lily', 'Charlie', 'Amelia', 'Thomas', 'Isabella', 'William'],
-  'Italia': ['Francesco', 'Sofia', 'Alessandro', 'Giulia', 'Lorenzo', 'Aurora', 'Andrea', 'Alice', 'Matteo', 'Ginevra', 'Gabriele', 'Emma', 'Leonardo', 'Martina', 'Riccardo'],
-  'España': ['Antonio', 'María', 'Manuel', 'Carmen', 'José', 'Ana', 'Francisco', 'Isabel', 'David', 'Laura', 'Juan', 'Cristina', 'Javier', 'Marta', 'Daniel'],
-  'Argentina': ['Santiago', 'Sofía', 'Mateo', 'Valentina', 'Martín', 'Martina', 'Lucas', 'Lucía', 'Benjamín', 'Camila', 'Juan', 'Julieta', 'Pedro', 'Agustina', 'Tomás']
-}
+  'China': ['Wei', 'Li', 'Wang', 'Zhang', 'Chen', 'Liu', 'Yang', 'Huang', 'Zhao', 'Wu', 'Xu', 'Sun', 'Ma', 'Zhou', 'Gao', 'Fang', 'Jie', 'Ming', 'Tian', 'Xiao', 'Qian', 'Mei', 'Lina', 'Cheng'],
+  'India': ['Amit', 'Priya', 'Rahul', 'Anjali', 'Vijay', 'Sunita', 'Raj', 'Pooja', 'Sanjay', 'Neha', 'Arjun', 'Rani', 'Deepak', 'Kiran', 'Manoj', 'Suresh', 'Meena', 'Ravi', 'Lakshmi', 'Kavita'],
+  'EE. UU.': ['John', 'Emily', 'Michael', 'Jessica', 'David', 'Ashley', 'James', 'Sarah', 'Robert', 'Amanda', 'William', 'Jennifer', 'Matthew', 'Elizabeth', 'Joshua', 'Andrew', 'Lauren', 'Christopher', 'Brittany', 'Daniel'],
+  'Indonesia': ['Agus', 'Siti', 'Budi', 'Dewi', 'Joko', 'Putri', 'Rizki', 'Fitri', 'Andi', 'Nur', 'Yusuf', 'Sri', 'Hendra', 'Rina', 'Dian', 'Adi', 'Ratna', 'Bayu', 'Wulan', 'Eka'],
+  'Pakistán': ['Ali', 'Fatima', 'Ahmed', 'Ayesha', 'Hassan', 'Sana', 'Imran', 'Zainab', 'Bilal', 'Maryam', 'Usman', 'Sara', 'Hamza', 'Rabia', 'Kashif', 'Nadia', 'Fahad', 'Zeeshan', 'Hina', 'Shahid'],
+  'Nigeria': ['Emeka', 'Ngozi', 'Chinedu', 'Amina', 'Ifeanyi', 'Bola', 'Uche', 'Chika', 'Tunde', 'Ada', 'Segun', 'Kemi', 'Yemi', 'Amaka', 'Sola', 'Nkechi', 'Tope', 'Obinna', 'Funke', 'Kunle'],
+  'Brasil': ['João', 'Maria', 'Pedro', 'Ana', 'Lucas', 'Juliana', 'Gabriel', 'Camila', 'Mateus', 'Larissa', 'Felipe', 'Beatriz', 'Rafael', 'Fernanda', 'Bruno', 'Gustavo', 'Patrícia', 'Tiago', 'Cláudia', 'Rodrigo'],
+  'Bangladés': ['Abir', 'Sumaiya', 'Hasan', 'Nusrat', 'Sabbir', 'Mitu', 'Rafi', 'Tania', 'Shuvo', 'Rima', 'Sakib', 'Mou', 'Tanvir', 'Jannat', 'Rasel', 'Nayeem', 'Farzana', 'Riad', 'Shanta', 'Rakib'],
+  'Rusia': ['Ivan', 'Anna', 'Dmitry', 'Olga', 'Sergey', 'Elena', 'Alexey', 'Natalia', 'Vladimir', 'Tatiana', 'Andrey', 'Ekaterina', 'Mikhail', 'Irina', 'Nikita', 'Yulia', 'Kirill', 'Svetlana', 'Oleg', 'Alina'],
+  'México': ['Juan', 'María', 'José', 'Guadalupe', 'Luis', 'Ana', 'Carlos', 'Carmen', 'Jorge', 'Patricia', 'Miguel', 'Verónica', 'Francisco', 'Leticia', 'Ricardo', 'Sandra', 'Alejandro', 'Claudia', 'Eduardo', 'Rosa'],
+  'Japón': ['Haruto', 'Yui', 'Sota', 'Rin', 'Yuto', 'Sakura', 'Yuki', 'Hina', 'Kaito', 'Mio', 'Ren', 'Yuna', 'Daiki', 'Aoi', 'Takumi', 'Hinata', 'Rei', 'Shota', 'Mei', 'Nao'],
+  'Filipinas': ['Jose', 'Maria', 'Juan', 'Angel', 'Mark', 'Grace', 'Paul', 'Joy', 'James', 'Rose', 'Michael', 'Ann', 'John', 'May', 'Anthony', 'Jessa', 'Liza', 'Carlo', 'Karen', 'Daniel'],
+  'Egipto': ['Mohamed', 'Fatma', 'Ahmed', 'Sara', 'Omar', 'Mona', 'Youssef', 'Aya', 'Mahmoud', 'Nour', 'Mostafa', 'Salma', 'Khaled', 'Heba', 'Tamer', 'Sherif', 'Yasmin', 'Walid', 'Layla', 'Amr'],
+  'Etiopía': ['Abebe', 'Alem', 'Kebede', 'Mulu', 'Tsegaye', 'Hana', 'Bekele', 'Selam', 'Getachew', 'Almaz', 'Tesfaye', 'Mekdes', 'Haile', 'Tigist', 'Solomon', 'Fikirte', 'Biruk', 'Yeshi', 'Daniel', 'Abel'],
+  'Vietnam': ['Nguyen', 'Anh', 'Tran', 'Hoa', 'Le', 'Huong', 'Phuong', 'Minh', 'Thu', 'Quang', 'Tuan', 'Hang', 'Duc', 'Linh', 'Son', 'Trang', 'Hien', 'Van', 'Nhan', 'Binh'],
+  'Alemania': ['Lukas', 'Sophie', 'Leon', 'Marie', 'Finn', 'Anna', 'Paul', 'Laura', 'Jonas', 'Lea', 'Ben', 'Lena', 'Elias', 'Mia', 'Maximilian', 'Julian', 'Nina', 'Tobias', 'Katharina', 'Jan'],
+  'Irán': ['Mohammad', 'Fatemeh', 'Ali', 'Zahra', 'Reza', 'Maryam', 'Hossein', 'Sara', 'Mehdi', 'Narges', 'Amir', 'Arezoo', 'Saeed', 'Shirin', 'Hassan', 'Leila', 'Ehsan', 'Parisa', 'Navid', 'Sanaz'],
+  'Turquía': ['Mehmet', 'Fatma', 'Mustafa', 'Ayşe', 'Ahmet', 'Emine', 'Ali', 'Hatice', 'Hüseyin', 'Zeynep', 'Hasan', 'Elif', 'İbrahim', 'Merve', 'Osman', 'Yusuf', 'Büşra', 'Kemal', 'Aylin', 'Can'],
+  'Francia': ['Lucas', 'Emma', 'Nathan', 'Chloé', 'Enzo', 'Manon', 'Louis', 'Léa', 'Hugo', 'Camille', 'Gabriel', 'Sarah', 'Arthur', 'Inès', 'Jules', 'Théo', 'Clara', 'Maxime', 'Zoé', 'Mathis'],
+  'Reino Unido': ['Oliver', 'Olivia', 'George', 'Emily', 'Harry', 'Jessica', 'Jack', 'Sophie', 'Jacob', 'Lily', 'Charlie', 'Amelia', 'Thomas', 'Isabella', 'William', 'Freddie', 'Grace', 'Alfie', 'Ruby', 'Oscar'],
+  'Italia': ['Francesco', 'Sofia', 'Alessandro', 'Giulia', 'Lorenzo', 'Aurora', 'Andrea', 'Alice', 'Matteo', 'Ginevra', 'Gabriele', 'Emma', 'Leonardo', 'Martina', 'Riccardo', 'Chiara', 'Tommaso', 'Elena', 'Nicola', 'Francesca'],
+  'España': ['Antonio', 'María', 'Manuel', 'Carmen', 'José', 'Ana', 'Francisco', 'Isabel', 'David', 'Laura', 'Juan', 'Cristina', 'Javier', 'Marta', 'Daniel', 'Lucía', 'Raúl', 'Sara', 'Álvaro', 'Elena'],
+  'Argentina': ['Santiago', 'Sofía', 'Mateo', 'Valentina', 'Martín', 'Martina', 'Lucas', 'Lucía', 'Benjamín', 'Camila', 'Juan', 'Julieta', 'Pedro', 'Agustina', 'Tomás', 'Facundo', 'Milagros', 'Nicolás', 'Josefina', 'Gonzalo']
+};
 
 // Generador de nombre según país:
 function generarNombrePorPais(pais) {
@@ -407,6 +442,8 @@ onMounted(generarBracketInicial)
 
 const usuarioEliminado = ref(false)
 const ganadorTorneo = ref(null)
+const mostrarModalGanador = ref(true)
+const mostrarModalCampeon = ref(true)
 
 // Modifica avanzarBracket para guardar el ganador si solo queda uno
 function avanzarBracket(usuarioPasa = false) {
@@ -891,28 +928,43 @@ function createConfetti() {
 
 /* Estilos del bracket mejorado */
 .bracket-visual-vertical-container {
-  width: 95%;
-  max-width: 1400px;
-  padding: 2rem;
-  margin: 2rem auto;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  padding: 0;
+  margin: 0;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
-  border-radius: 30px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  overflow: auto;
+  border-radius: 0;
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .bracket-vertical {
   display: flex;
-  justify-content: space-between;
-  padding: 2rem;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center; /* Cambia flex-end por center */
   gap: 4rem;
+  min-width: max-content;
+  width: fit-content;
+  margin: 0 auto;
+  height: 100%;
 }
 
 .bracket-vertical-row {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  align-items: center; /* Centra las celdas verticalmente */
+  justify-content: center; /* Añade esto para centrar verticalmente cada columna */
+  min-height: 100%;
+  height: 100%;
 }
 
 .round-label {
@@ -1361,5 +1413,34 @@ function createConfetti() {
   .ganador-stats-list li {
     padding: 0.6rem 1rem;
   }
+}
+
+.reiniciar-bracket-btn {
+  display: block;
+  margin: 2rem auto 0 auto;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #6366f1, #ec4899);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px #6366f155;
+  transition: background 0.2s, transform 0.2s;
+}
+.reiniciar-bracket-btn:hover {
+  background: linear-gradient(90deg, #ec4899, #6366f1);
+  transform: scale(1.05);
+}
+
+/* Clase para el botón de reinicio fijo en el bracket final */
+.reiniciar-bracket-btn-fixed {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  animation: fadeInUp 0.6s ease forwards;
 }
 </style>
