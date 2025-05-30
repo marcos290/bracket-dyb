@@ -241,7 +241,7 @@ const props = defineProps(['personaje'])
 
 const poblacionTotal = 100
 const porcentajeLuchadores = 0.32 // Modificado para tener 32 luchadores
-const cantidadLuchadores = Math.floor(poblacionTotal * porcentajeLuchadores)
+const cantidadLuchadores = 1023
 
 const paisesProb = [
   { nombre: 'China', emoji: '🇨🇳', peso: 17.4 },
