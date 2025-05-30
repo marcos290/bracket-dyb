@@ -348,7 +348,12 @@ const discapacidades = [
   'Ninguna', 'Sin un ojo', 'Sin un brazo', 'Sin una pierna', 'Sin piernas', 'Sin dedo pulgar', 'Sin oreja',
   'Cojea', 'Brazo ortopédico', 'Pierna ortopédica', 'Ceguera parcial', 'Sin dedos de los pies', '8 dedos en una mano', 'Solo 3 dedos',
   'Brazo hasta el codo', 'Sin boca', 'Sin pie', 'Sin mano', 'Sin rodilla', 'Sin codo', 'Sin hombro', 'Pierna hasta la rodilla','Impotencia','Sin testículos','Dierna',
-  'Cegera total', 'Sin nariz', 'Sin cadera', 'Sin tobillo', 'Sin muñeca', 
+  'Cegera total', 'Sin nariz', 'Sin cadera', 'Sin tobillo', 'Sin muñeca',   'Mano en forma de garra', 'Piernas invertidas', 'Cuello girado permanentemente', 'Columna en zigzag', 'Solo camina en círculos',
+  'Sin ombligo', 'Párpados que no cierran', 'Dedos permanentemente pegados', 'Rodilla con bisagra', 'Cejas ausentes de nacimiento',
+  'Lengua bífida no intencional', 'Cola rudimentaria', 'Orejas en la nuca', 'Respira por la espalda', 'Sin sombra propia',
+  'Glúteos asimétricos', 'Cabeza con forma de cubo', 'Un solo pulmón funcional', 'Hombros dislocados por defecto', 'Sin equilibrio (literal)',
+  'Pierna con sentido del gusto', 'Sin huellas dactilares', 'Un solo orificio nasal', 'Ceguera selectiva a colores feos', 'Manos al revés',
+  'Sin papilas gustativas', 'Hipersensibilidad a las palabras largas', 'Tobillos que crujen como aplausos', 'Dedos de los pies en las manos', 'Articulaciones que suenan como flautas'
 ]
 // Nueva función para generar discapacidad con un 20% de probabilidad
 function generarDiscapacidadProb() {
