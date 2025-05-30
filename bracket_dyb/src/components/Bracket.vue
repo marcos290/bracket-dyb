@@ -466,10 +466,10 @@ function avanzarBracket(usuarioPasa = false) {
       // El rival pasa automáticamente
       siguiente.push(a.esUsuario ? b : a)
     } else {
-      // Gana el de mayor peso+altura
-      const sumaA = a.peso + a.altura
-      const sumaB = b.peso + b.altura
-      siguiente.push(sumaA >= sumaB ? a : b)
+      // Solo para simulados: aplica la fórmula y la discapacidad
+      const fuerzaA = fuerzaLuchador(a)
+      const fuerzaB = fuerzaLuchador(b)
+      siguiente.push(fuerzaA >= fuerzaB ? a : b)
     }
   }
   bracket.value.push(siguiente)
@@ -629,6 +629,15 @@ function createConfetti() {
       confetti.remove();
     }, 3000 + (randomAnimationDelay * 1000));
   }
+}
+
+// Nueva función para calcular la fuerza del luchador
+function fuerzaLuchador(l) {
+  let fuerza = (l.pressBanca * 1.5) + (l.altura * 2) + (l.peso * 1.75);
+  if (l.discapacidad && l.discapacidad !== 'Ninguna') {
+    fuerza *= 0.5;
+  }
+  return fuerza;
 }
 </script>
 
