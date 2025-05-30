@@ -90,18 +90,18 @@
         <div class="fighter-header-row">
           <img :src="avatarDefault" alt="Avatar" class="avatar-mini" />
         </div>
-        <!-- Luchador principal -->
+        <!-- Luchador principal SIEMPRE a la izquierda -->
         <ul class="fighter-list blue-bg">
-          <li><b>Nombre:</b> {{ personaje.nombre }}</li>
-          <li><b>País:</b> {{ personaje.pais }} <span v-if="personaje.bandera">{{ personaje.bandera }}</span></li>
-          <li><b>Altura:</b> {{ personaje.altura }} cm</li>
-          <li><b>Peso:</b> {{ personaje.peso }} kg</li>
-          <li><b>Press banca:</b> {{ personaje.pressBanca }} kg</li>
-          <li><b>Agilidad:</b> {{ personaje.agilidad }}</li>
-          <li><b>Objeto:</b> {{ personaje.objeto }}</li>
-          <li><b>Habilidad con el objeto:</b> {{ personaje.habilidad }}</li>
-          <li><b>Profesión:</b> {{ personaje.profesion }}</li>
-          <li><b>Discapacidad:</b> {{ personaje.discapacidad }}</li>
+          <li><b>Nombre:</b> {{ usuarioLuchador.nombre }}</li>
+          <li><b>País:</b> {{ usuarioLuchador.pais }} <span v-if="usuarioLuchador.bandera">{{ usuarioLuchador.bandera }}</span></li>
+          <li><b>Altura:</b> {{ usuarioLuchador.altura }} cm</li>
+          <li><b>Peso:</b> {{ usuarioLuchador.peso }} kg</li>
+          <li><b>Press banca:</b> {{ usuarioLuchador.pressBanca }} kg</li>
+          <li><b>Agilidad:</b> {{ usuarioLuchador.agilidad }}</li>
+          <li><b>Objeto:</b> {{ usuarioLuchador.objeto }}</li>
+          <li><b>Habilidad con el objeto:</b> {{ usuarioLuchador.habilidad }}</li>
+          <li><b>Profesión:</b> {{ usuarioLuchador.profesion }}</li>
+          <li><b>Discapacidad:</b> {{ usuarioLuchador.discapacidad }}</li>
         </ul>
       </div>
       <div class="vs-center">
@@ -111,18 +111,18 @@
         <div class="fighter-header-row">
           <img :src="avatarDefault" alt="Avatar" class="avatar-mini-rival" />
         </div>
-        <!-- Rival -->
+        <!-- Rival SIEMPRE a la derecha -->
         <ul class="fighter-list red-bg">
-          <li><b>Nombre:</b> {{ rival.nombre }}</li>
-          <li><b>País:</b> {{ rival.pais }} <span v-if="rival.bandera">{{ rival.bandera }}</span></li>
-          <li><b>Altura:</b> {{ rival.altura }} cm</li>
-          <li><b>Peso:</b> {{ rival.peso }} kg</li>
-          <li><b>Press banca:</b> {{ rival.pressBanca }} kg</li>
-          <li><b>Agilidad:</b> {{ rival.agilidad }}</li>
-          <li><b>Objeto:</b> {{ rival.objeto }}</li>
-          <li><b>Habilidad con el objeto:</b> {{ rival.habilidad }}</li>
-          <li><b>Profesión:</b> {{ rival.profesion }}</li>
-          <li><b>Discapacidad:</b> {{ rival.discapacidad }}</li>
+          <li><b>Nombre:</b> {{ rivalLuchador.nombre }}</li>
+          <li><b>País:</b> {{ rivalLuchador.pais }} <span v-if="rivalLuchador.bandera">{{ rivalLuchador.bandera }}</span></li>
+          <li><b>Altura:</b> {{ rivalLuchador.altura }} cm</li>
+          <li><b>Peso:</b> {{ rivalLuchador.peso }} kg</li>
+          <li><b>Press banca:</b> {{ rivalLuchador.pressBanca }} kg</li>
+          <li><b>Agilidad:</b> {{ rivalLuchador.agilidad }}</li>
+          <li><b>Objeto:</b> {{ rivalLuchador.objeto }}</li>
+          <li><b>Habilidad con el objeto:</b> {{ rivalLuchador.habilidad }}</li>
+          <li><b>Profesión:</b> {{ rivalLuchador.profesion }}</li>
+          <li><b>Discapacidad:</b> {{ rivalLuchador.discapacidad }}</li>
         </ul>
       </div>
     </div>
@@ -477,7 +477,8 @@ function avanzarHastaElFinal() {
 }
 
 const personaje = computed(() => luchadores.value[0])
-const rival = computed(() => luchadores.value[1])
+const usuarioLuchador = computed(() => luchadores.value.find(l => l.esUsuario) || luchadores.value[0])
+const rivalLuchador = computed(() => luchadores.value.find(l => !l.esUsuario) || luchadores.value[1])
 
 // Detecta si ya eres campeón
 const esCampeon = computed(() => luchadores.value.length === 1 && ganador.value)
