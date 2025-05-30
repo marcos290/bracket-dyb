@@ -334,7 +334,12 @@ const objetos = [
   'Almohada', 'Linterna', 'Pelota', 'Botella', 'Paraguas', 'Cascabel', 'Cinta adhesiva', 'Cubo', 'Espejo', 'Zapatilla',
   'Candelabro', 'Teléfono viejo', 'Llave inglesa', 'Cuaderno', 'Cacerola', 'Estuche', 'Cinta métrica', 'Gafas de sol', 'Juguete', 'Percha',
   'Mochila', 'Colador', 'Bote de pintura', 'Tijeras', 'Radiocasete', 'Muñeca', 'Cepillo para el pelo', 'Toalla', 'Globo', 'Alambre',
-  'Dildo de Goma Rosa de 30 cm' ,'Muñeca inchable','Porro', 'Bastón de madera', 'Cinturón de castidad', 'Pipa de agua', 'Bola de bolos', 'Cuchara de palo', 'Escudo medieval',
+  'Dildo de Goma Rosa de 30 cm' ,'Muñeca inchable','Porro', 'Bastón de madera', 'Cinturón de castidad', 'Pipa de agua', 'Bola de bolos', 'Cuchara de palo', 'Escudo medieval',  'Consolador con forma de dragón', 'Tostadora poseída', 'Tanga de leopardo XXL', 'Mano de maniquí', 'Pato de goma ninja',
+  'Cabeza de muñeca rota', 'Calcetín sudado de un vikingo', 'Taza que grita al llenarse', 'Cucharón sagrado de la abuela', 'Tubo de ensayo con esperma de unicornio',
+  'Cráneo de plástico con luces LED', 'Cenicero con forma de pie', 'Espátula bendecida por un monje budista', 'Brazalete de castidad mental', 'Plátano de peluche usado',
+  'Braga con WiFi', 'Reloj de muñeca que da shocks eléctricos', 'Nariz falsa con bigote', 'Kit de iniciación para invocar demonios', 'Tenedor con GPS',
+  'Zanahoria fosforescente', 'Rana disecada con capa', 'Camiseta que dice “No soy tu padre”', 'Pastilla de jabón en forma de pene', 'Spray anti fantasmas',
+  'Oreja de goma tamaño real', 'Disfraz de hot dog usado', 'Esqueleto de pez prehistórico de juguete', 'Cojín que se ríe solo', 'Biberón para adultos'
 ];
 
 const generarObjeto = () => objetos[Math.floor(Math.random() * objetos.length)]
