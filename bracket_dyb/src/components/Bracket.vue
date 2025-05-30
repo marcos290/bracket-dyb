@@ -297,12 +297,35 @@ const generarExperiencia = () => Math.floor(Math.random() * 11)
 const generarCondicionFisica = () => Math.floor(Math.random() * 51) + 50
 const generarCoeficienteLucha = () => (Math.random() * 2 + 1).toFixed(2)
 const generarPressBanca = () => Math.floor(Math.random() * 101) + 50 // 50 a 150
-
 const profesiones = [
   'Ingeniero', 'Camionero', 'Profesor', 'Médico', 'Panadero', 'Policía', 'Bombero', 'Carpintero', 'Fontanero',
   'Cocinero', 'Mecánico', 'Abogado', 'Artista', 'Músico', 'Deportista', 'Científico', 'Enfermero', 'Piloto',
-  'Electricista', 'Jardinero', 'Veterinario', 'Periodista', 'Informático', 'Arquitecto', 'Estilista'
-]
+  'Electricista', 'Jardinero', 'Veterinario', 'Periodista', 'Informático', 'Arquitecto', 'Estilista',
+  'Psicólogo', 'Contador', 'Farmacéutico', 'Dentista', 'Soldado', 'Astrónomo', 'Biólogo', 'Geólogo', 'Historiador',
+  'Librero', 'Recepcionista', 'Actor', 'Cantante', 'Locutor', 'Programador', 'Diseñador gráfico', 'Diseñador de moda',
+  'Tatuador', 'Barbero', 'Esteticista', 'Conductor de autobús', 'Conductor de tren', 'Taxista', 'Marinero',
+  'Pescador', 'Minero', 'Obrero', 'Albañil', 'Guardabosques', 'Agente inmobiliario', 'Chef', 'Sommelier',
+  'Mesero', 'Barman', 'Guía turístico', 'Traductor', 'Intérprete', 'Notario', 'Juez', 'Fiscal', 'Secretario',
+  'Asistente virtual', 'Técnico de laboratorio', 'Radiólogo', 'Paramédico', 'Físico', 'Químico', 'Matemático',
+  'Economista', 'Politólogo', 'Sociólogo', 'Antropólogo', 'Filósofo', 'Teólogo', 'Pastor', 'Sacerdote',
+  'Monja', 'Monje', 'Astronauta', 'Controlador aéreo', 'Ingeniero aeroespacial', 'Ingeniero civil', 
+  'Ingeniero eléctrico', 'Ingeniero mecánico', 'Ingeniero químico', 'Bioingeniero', 'Zoologo', 'Botánico',
+  'Ecólogo', 'Meteorólogo', 'Oceanógrafo', 'Ingeniero ambiental', 'Diseñador de videojuegos', 
+  'Desarrollador web', 'Ciberseguridad', 'Analista de datos', 'Consultor', 'Coach', 'Entrenador personal',
+  'Nutricionista', 'Chef vegano', 'Panadero artesanal', 'Cerrajero', 'Tapicero', 'Decorador de interiores',
+  'Agente de seguros', 'Corredor de bolsa', 'Banquero', 'Cajero', 'Logopeda', 'Terapeuta ocupacional',
+  'Fisioterapeuta', 'Kinesiólogo', 'Dietista', 'Optometrista', 'Podólogo', 'Ortopedista', 'Geriatra',
+  'Pediatra', 'Neurólogo', 'Cardiólogo', 'Urólogo', 'Dermatólogo', 'Oncólogo', 'Cirujano', 'Anestesista',
+  'Endocrinólogo', 'Reumatólogo','Actor/Actriz porno', 'Probador de colchones', 'Catador de helados', 'Espantapájaros humano', 'Tirador de confeti profesional',
+  'Catador de agua de grifo', 'Organizador de peleas de almohadas', 'Domador de caracoles', 'Influencer de cementerio',
+  'Probador de videojuegos de granjas', 'Acariciador de gatos profesional', 'Modelador de cera para velas aromáticas',
+  'Detective de olores raros', 'Técnico de aplausos en vivo', 'Psicólogo de plantas', 'Cazador de fantasmas freelance',
+  'Contador de ovejas nocturno', 'Repartidor de abrazos', 'Asistente de mago mediocre', 'Editor de memes vintage',
+  'Diseñador de croquetas gourmet', 'Asistente de payaso triste', 'Fotógrafo de pies', 'Recreador de escenas históricas con títeres',
+  'Animador de ascensores', 'Escribidor de mensajes en galletas de la fortuna', 'Comediante de funerales', 'Reparador de pelucas',
+  'Pastor de llamas zen', 'Crítico de películas que no ha visto'
+];
+
 const generarProfesion = () => profesiones[Math.floor(Math.random() * profesiones.length)]
 
 const objetos = [ 
