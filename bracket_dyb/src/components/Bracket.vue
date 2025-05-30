@@ -17,7 +17,7 @@
     >👊 Volver a mi lucha</button>
 
     <!-- Bracket visual SOLO si mostrarBracket está activo o el usuario ha sido eliminado -->
-    <div v-if="mostrarBracket || usuarioEliminado" class="bracket-visual-vertical-container">
+    <div v-if="(mostrarBracket && !((esCampeon && !mostrarModalCampeon) || (usuarioEliminado && !mostrarModalGanador)))" class="bracket-visual-vertical-container">
       <div class="bracket-vertical">
         <div
           v-for="(ronda, rondaIdx) in [...bracket].reverse()"
@@ -500,10 +500,16 @@ function siguienteRival() {
 function perderRival() {
   usuarioEliminado.value = true
   avanzarBracket(false)
-  // Elimina al usuario de luchadores.value para que no siga apareciendo en combates
   const nuevaRonda = bracket.value[rondaActual.value]
   luchadores.value.splice(0, luchadores.value.length, ...nuevaRonda)
-  avanzarHastaElFinal() // <-- AVANZA HASTA EL FINAL
+  avanzarHastaElFinal()
+  setTimeout(() => {
+    const container = document.querySelector('.bracket-visual-vertical-container');
+    if (container) {
+      container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+      container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+    }
+  }, 100);
 }
 
 function avanzarHastaElFinal() {
